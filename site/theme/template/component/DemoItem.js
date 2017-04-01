@@ -16,6 +16,12 @@ export default class DemoItem extends React.Component {
     this.toggleCode = this.toggleCode.bind(this);
 	}
 
+  componentWillReceiveProps(next) {
+    if (next.selectIndex !== this.props.index) {
+      this.setState({ expand: false });
+    }
+  }
+
 
 	onChangeValue(newValue){
 		const { data } = this.props;
@@ -23,14 +29,15 @@ export default class DemoItem extends React.Component {
 	}
 
 	toggleCode(e){
+    this.props.toggleFrame(this.props.index);
 		this.setState({
 			expand: !this.state.expand
-		})
+		});
 	}
 	
 
 	render(){
-		const { data, selectIndex, index, toggleCode, showExpandDemo, toggleFrame, utils } = this.props;
+		const { data, selectIndex, index, showExpandDemo, toggleFrame, utils } = this.props;
 		const { expand } = this.state;
 
 		const paneProps = {
@@ -46,16 +53,13 @@ export default class DemoItem extends React.Component {
 			onChange: this.onChangeValue.bind(this)
 		}
 
-		// console.log(data)
-
 		return(
 			<div className={classnames('demo-card', {
 	          'demo-expand': expand,
-	          'demo-selected': selectIndex == index
+	          'demo-selected': selectIndex === index,
 	        })}
-				onClick={e => toggleFrame(index)}
 	    >
-				<h3 className="title">{data.meta.title}</h3>
+				<h3 className="title" onClick={e => this.toggleCode(index)}>{data.meta.title}</h3>
 				<CopyToClipboard 
 					text={data.content}
 					onCopy={() => Message.info('复制成功！')}
@@ -73,13 +77,7 @@ export default class DemoItem extends React.Component {
 						})}
 					/>
 				</span>
-				<span className="demo-btn toggle-btn" onClick={e => this.toggleCode()}>
-
-					<i className={classnames('iconfont', {
-              'icon-arrow-up': expand,
-              'icon-arrow-down': !expand,
-            })} />
-        </span>
+				
           {expand && 
           	<div>
           		<AceEditor {...paneProps} />
@@ -90,4 +88,12 @@ export default class DemoItem extends React.Component {
 		);
 	}
 }
-          // <input type="text" ref="content" style={{ display:'none'}} value={data.content}/>
+/*
+<span className="demo-btn toggle-btn" onClick={e => this.toggleCode()}>
+
+  <i className={classnames('iconfont', {
+      'icon-arrow-up': expand,
+      'icon-arrow-down': !expand,
+    })} />
+</span>
+       */
